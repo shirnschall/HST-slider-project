@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <script type="text/javascript">
+        var width = screen.width;
+        var meta = document.createElement('meta');
+            meta.name = "viewport";
+            
+        if (width < 600) { 
+            meta.content = "width=device-width,initial-scale=" + width / 540;
+            document.getElementsByTagName("head")[0].appendChild(meta);
+        } else {
+            meta.content = "width=device-width,initial-scale=1";
+            document.getElementsByTagName("head")[0].appendChild(meta);
+        }
+        </script>
+        
+        <style>
+            input{
+                font-size: 18pt !important;
+            }
+            body{
+                font-size: 16pt;
+                font-family: sans-serif;
+            }
+            .start-stop{
+                  width: 420px;
+                  height: 40px;
+                  border-radius: 20px;
+                  background: white;
+                  font-size: 24px;
+                  border: 1px solid lightgrey;
+                  cursor: pointer;
+                  -webkit-appearance: none;
+                  margin: 10px 10px;
+            }
+            .config{
+                  width: 200px;
+                  height: 40px;
+                  border-radius: 20px;
+                  background: white;
+                  font-size: 24px;
+                  border: 1px solid lightgrey;
+                  cursor: pointer;
+                  -webkit-appearance: none;
+                  margin: 10px 10px;
+            }
+            button:hover{
+                background-color: #0094e2;
+                color: #fff;
+            }
+            .heading{
+                text-align: center;
+                font-size: 20pt;
+                font-weight: bold;
+            }
+            td{
+                text-align: center;
+            }
+            #container{
+                width: 500px;
+                margin: auto;
+                text-align: center;
+                padding: 20px 10px 0px 10px;
+            }
+            table{
+                /*border: 1px solid black;*/
+                margin: auto;
+                padding-top: 10px;
+            }
+            html, body{
+                margin: 0px;
+                padding:0px;
+                width: 100%;
+                height: 100%;
+                background-color: #f7f7f7;
+            }
+            button{
+                touch-action: manipulation;
+            }
+            progress{
+                min-width: 400px;
+                margin-top: 30px;
+                margin-bottom: 30px;
+            }
+            .start-stop{
+                margin-top: 30px;
+            }
+            
+        </style>
+        
+    </head>
+    <body>
+        <div id="container">
+            <table>
+                <tr class="heading">
+                    <td colspan="2"><label for="file">Current Job:</label></td>
+                </tr>
+                <tr>
+                <td colspan="2"><progress id="file" value="32" max="100"> </progress><td>
+                </tr>
+                <tr>
+                    <td id="photosRemaining">Img: 20/600</td>
+                    <td id="timeRemaining">Time remaining: 7000s</td>                </tr>            </table>            
+            <a href="?index"><button class="start-stop" id="start">Stop</button></a>
+            
+        </div>
+        <script>
+            window.setInterval('refresh()', 5000); 	
+
+            function refresh() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("timeRemaining").innerHTML= this.responseText;
+                        }
+                    }; 
+                    xhr.open("GET", "/readings", true);
+                    xhr.send();
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("photosRemaining").innerHTML= this.responseText;  
+                        }
+                    }; 
+
+                    xhr.open("GET", "/readings", true);
+                    xhr.send();
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("file").innerHTML= parseFloat(this.responseText); 
+                        }
+                    }; 
+                    xhr.open("GET", "/readings", true);
+                    xhr.send();
+            }
+            refresh();
+        </script>
+    </body>
+</html>
