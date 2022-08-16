@@ -1,6 +1,6 @@
 //---------------------------------------------------
 #include <ESP8266WiFi.h>
-const char *ssid = "slider-v2";
+const char *ssid = "HS-Slider";
 const char *password = "Sebastian012";
 IPAddress localIp(192,168,5,1);
 IPAddress gateway(192,168,5,1);
@@ -141,6 +141,10 @@ const char index_html[] PROGMEM = R"rawliteral(<!doctype html>
             button{
                 touch-action: manipulation;
             }
+            .slider{
+                width: 200px;
+                margin: 0px 10px;
+            }
             
             
         </style>
@@ -200,31 +204,30 @@ const char index_html[] PROGMEM = R"rawliteral(<!doctype html>
         </div>
         
             <hr>
-        <table width="500px">
-            <tr class="heading">
-            <td colspan="3">Motion Type (in beta)</td>
-            </tr>
-            <tr>
-                <td><input type="radio" name="motionType" checked="checked" value="linear" id="linear"><label for="linear">Linear</label></td>
-            <td>Ease In</td>
-            <td>Ease Out</td>
-            </tr>
-            <tr>
-            <td><input type="radio" name="motionType" value="easeInOut" id="easeInOut"><label for="easeInOut">Ease in/out</label></td>
-            <td><input type="radio" name="motionType" value="easeIn" id="easeIn"><label for="easeIn">Ease in</label></td>
-            <td><input type="radio" name="motionType" value="easeOut" id="easeOut"><label for="easeOut">Ease out</label></td>
-            </tr>
-            <tr>
-            <td><input type="radio" name="motionType" value="rampInOut" id="rampInOut"><label for="rampInOut">Ramp in/out</label></td>
-            <td><input type="radio" name="motionType" value="rampIn" id="rampIn"><label for="rampIn">Ramp in</label></td>
-            <td><input type="radio" name="motionType" value="rampOut" id="rampOut"><label for="rampOut">Ramp out</label></td>
-            </tr>
-        </table>
+            <div class="slidecontainer">
+                <table>
+                    <tr class="heading"><td colspan="3">Current Position</td></tr>
+                    <tr>
+                    <td><button class="slider-l" id="slider-minus-big-3" onclick="goToMinus(10)">-10</button><button class="slider-r" id="slider-minus-3" onclick="goToMinus(1)">-1</button></td>
+                    <td><progress id="slider-3" value="32" max="100" class="slider"> </progress></td>
+                    <td><button class="slider-l" id="slider-plus-3" onclick="goToPlus(1)">+1</button><button class="slider-r" id="slider-plus-big-3" onclick="goToPlus(10)">+10</button></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><center><div class="slider-value" id="slider-value-3">16</div></center></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
         
             <hr>
         <table>
-            <tr colspan="2">
-                <td><a href="?home"><button class="start-stop" id="home">Home</button></a></td>
+            <tr>
+                <td><button class="config" id="gotostart"  onclick="goToStart()">Go to Start</button></td>
+                <td><button class="config" id="gotoend"  onclick="goToEnd()">Go to End</button></td>
+            </tr>
+            <tr>
+                <td  colspan="2"><button class="start-stop" id="home" onclick="home()">Home</button></td>
             </tr>
             <tr>
                 <td colspan="2"><button class="start-stop" id="start" onclick="startJob()">Start</button></td>
@@ -288,6 +291,44 @@ const char index_html[] PROGMEM = R"rawliteral(<!doctype html>
                 else
                 window.location.replace("?start"+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
             }
+            function home(){
+                dur = document.getElementById("duration").value.toString();
+                noPics = document.getElementById("noPics").value.toString();
+                window.location.replace("?home"+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+            }
+            function goToStart(){
+                dur = document.getElementById("duration").value.toString();
+                noPics = document.getElementById("noPics").value.toString();
+                window.location.replace("?gotopos="+slider[0].value+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+            }
+            function goToEnd(){
+                dur = document.getElementById("duration").value.toString();
+                noPics = document.getElementById("noPics").value.toString();
+                window.location.replace("?gotopos="+slider[1].value+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+            }
+            function goToPlus(delta){
+                dur = document.getElementById("duration").value.toString();
+                noPics = document.getElementById("noPics").value.toString();
+                window.location.replace("?gotoplus="+delta+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+            }
+            function goToMinus(delta){
+                dur = document.getElementById("duration").value.toString();
+                noPics = document.getElementById("noPics").value.toString();
+                window.location.replace("?gotominus="+delta+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+            }
+
+            function refresh() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("slider-3").value= parseFloat(this.responseText); 
+                            document.getElementById("slider-value-3").innerHTML = parseFloat(this.responseText);
+                        }
+                    }; 
+                    xhr.open("GET", "?currentpos", true);
+                    xhr.send();
+            }
+            refresh();
         </script>
     </body>
 </html>
@@ -426,7 +467,7 @@ const char status_html[] PROGMEM = R"rawliteral(<!doctype html>
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("file").value= parseFloat(this.responseText); 
+                            document.getElementById("file").value= parseFloat(this.responseText); 
                         }
                     }; 
                     xhr.open("GET", "?percentDone", true);
@@ -482,6 +523,16 @@ char goToPos(int pos,char homing = 0){
   return 0;
 }
 
+
+// Replaces placeholder with stored values
+String processor(const String& var){
+  //Serial.println(var);
+  if(var == "inputString"){
+    return "test";
+  }
+  return String();
+}
+
 void handleRequest(){
   Serial.println("request for / received..");
 
@@ -516,10 +567,25 @@ void handleRequest(){
     Serial.print("photoSteps: ");
     Serial.println(photoSteps);
   }
-
+  else if(currentStatus == 'i' && server.hasArg("currentpos")){
+    Serial.println("sending curretn position update");
+    server.send ( 200, "text/html", String(100*(float)currentPos/MAX_POS));
+  }
+  else if(currentStatus == 'i' && server.hasArg("gotominus")){
+    Serial.println("moving in negative direction");
+    int delta = (server.arg("gotominus")).toInt();
+    goToPos(currentPos-delta*MICROSTEPS*4);
+    server.send_P ( 200, "text/html", index_html, processor);
+  }
+  else if(currentStatus == 'i' && server.hasArg("gotoplus")){
+    Serial.println("moving in positive direction");
+    int delta = (server.arg("gotominus")).toInt();
+    goToPos(currentPos+delta*MICROSTEPS*4);
+    server.send ( 200, "text/html", index_html);
+  }
   else if(currentStatus == 's' && server.hasArg("percentDone")){
     Serial.println("sending status update");
-    server.send ( 200, "text/html", String(currentPhoto/numberPhotos));
+    server.send ( 200, "text/html", String(100*(float)currentPhoto/numberPhotos));
   }
   else if(currentStatus == 's' && server.hasArg("photosRemaining")){
     server.send ( 200, "text/html", "Img: " + String(currentPhoto) + "/" + String(numberPhotos));

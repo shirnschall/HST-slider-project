@@ -102,11 +102,11 @@
                 <tr>
                     <td id="photosRemaining">Img: 20/600</td>
                     <td id="timeRemaining">Time remaining: 7000s</td>                </tr>            </table>            
-            <a href="?index"><button class="start-stop" id="start">Stop</button></a>
+            <a href="?stop"><button class="start-stop" id="start">Stop</button></a>
             
         </div>
         <script>
-            window.setInterval('refresh()', 5000); 	
+            window.setInterval('refresh()', 5000);   
 
             function refresh() {
                     var xhr = new XMLHttpRequest();
@@ -115,7 +115,7 @@
                             document.getElementById("timeRemaining").innerHTML= this.responseText;
                         }
                     }; 
-                    xhr.open("GET", "/readings", true);
+                    xhr.open("GET", "?timeRemaining", true);
                     xhr.send();
 
                     var xhr = new XMLHttpRequest();
@@ -125,15 +125,15 @@
                         }
                     }; 
 
-                    xhr.open("GET", "/readings", true);
+                    xhr.open("GET", "?photosRemaining", true);
                     xhr.send();
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("file").innerHTML= parseFloat(this.responseText); 
+                            document.getElementById("file").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "/readings", true);
+                    xhr.open("GET", "?percentDone", true);
                     xhr.send();
             }
             refresh();
