@@ -1,3 +1,7 @@
+
+#include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 //---------------------------------------------------
 #include <ESP8266WiFi.h>
 const char *ssid = "HS-Slider";
@@ -6,8 +10,8 @@ IPAddress localIp(192,168,5,1);
 IPAddress gateway(192,168,5,1);
 IPAddress subnet(255,255,255,0);
 //---------------------------------------------------
-#include <ESP8266WebServer.h>
-ESP8266WebServer server(80);  //listen to port 80
+#include <ESPAsyncWebServer.h>
+AsyncWebServer server(80);  //listen to port 80
 //---------------------------------------------------
 #include <Arduino.h>
 #include "BasicStepperDriver.h"
@@ -533,27 +537,27 @@ String processor(const String& var){
   return String();
 }
 
-void handleRequest(){
+void handleRequest(AsyncWebServerRequest *request){
   Serial.println("request for / received..");
 
-  if(currentStatus == 'i' && server.hasArg("home")){
+  if(currentStatus == 'i' && request->hasParam("home")){
     Serial.println("homing.. ");
-    server.send ( 200, "text/html", index_html);
+    request->send ( 200, "text/html", index_html);
     while(!digitalRead(ENDSTOP_PIN)){
       goToPos(currentPos-MOTOR_STEPS*MICROSTEPS*4,1);
     }
     currentPos=0;
     Serial.println("homed.");
     disableStepper();
-  }else if(currentStatus == 'i' && server.hasArg("start") && server.hasArg("pos1") && server.hasArg("pos2") && server.hasArg("duration") && server.hasArg("nopics")){
+  }else if(currentStatus == 'i' && request->hasParam("start") && request->hasParam("pos1") && request->hasParam("pos2") && request->hasParam("duration") && request->hasParam("nopics")){
     Serial.println("starting timelapse.");
-    server.send ( 200, "text/html", status_html);
+    request->send ( 200, "text/html", status_html);
 
     currentPhoto=0;
-    numberPhotos = (server.arg("nopics")).toFloat();
-    photoInterval = (server.arg("duration")).toFloat()/(server.arg("nopics")).toFloat()*1000;
-    goToPos((int)((float)(server.arg("pos1")).toFloat()/100*MAX_POS));
-    photoSteps = (int)((float)(((server.arg("pos2")).toFloat()-(server.arg("pos1")).toFloat())/100*MAX_POS)/numberPhotos);
+    numberPhotos = (request->getParam("nopics")->value()).toFloat();
+    photoInterval = (request->getParam("duration")->value()).toFloat()/(request->getParam("nopics")->value()).toFloat()*1000;
+    goToPos((int)((float)(request->getParam("pos1")->value()).toFloat()/100*MAX_POS));
+    photoSteps = (int)((float)(((request->getParam("pos2")->value()).toFloat()-(request->getParam("pos1")->value()).toFloat())/100*MAX_POS)/numberPhotos);
     currentStatus ='s';
 
     Serial.print("currentPhoto: ");
@@ -567,47 +571,47 @@ void handleRequest(){
     Serial.print("photoSteps: ");
     Serial.println(photoSteps);
   }
-  else if(currentStatus == 'i' && server.hasArg("currentpos")){
+  else if(currentStatus == 'i' && request->hasParam("currentpos")){
     Serial.println("sending curretn position update");
-    server.send ( 200, "text/html", String(100*(float)currentPos/MAX_POS));
+    request->send ( 200, "text/html", String(100*(float)currentPos/MAX_POS));
   }
-  else if(currentStatus == 'i' && server.hasArg("gotominus")){
+  else if(currentStatus == 'i' && request->hasParam("gotominus")){
     Serial.println("moving in negative direction");
-    int delta = (server.arg("gotominus")).toInt();
+    int delta = (request->getParam("gotominus")->value()).toInt();
     goToPos(currentPos-delta*MICROSTEPS*4);
-    server.send_P ( 200, "text/html", index_html, processor);
+    request->send_P ( 200, "text/html", index_html, processor);
   }
-  else if(currentStatus == 'i' && server.hasArg("gotoplus")){
+  else if(currentStatus == 'i' && request->hasParam("gotoplus")){
     Serial.println("moving in positive direction");
-    int delta = (server.arg("gotominus")).toInt();
+    int delta = (request->getParam("gotominus")->value()).toInt();
     goToPos(currentPos+delta*MICROSTEPS*4);
-    server.send ( 200, "text/html", index_html);
+    request->send ( 200, "text/html", index_html);
   }
-  else if(currentStatus == 's' && server.hasArg("percentDone")){
+  else if(currentStatus == 's' && request->hasParam("percentDone")){
     Serial.println("sending status update");
-    server.send ( 200, "text/html", String(100*(float)currentPhoto/numberPhotos));
+    request->send ( 200, "text/html", String(100*(float)currentPhoto/numberPhotos));
   }
-  else if(currentStatus == 's' && server.hasArg("photosRemaining")){
-    server.send ( 200, "text/html", "Img: " + String(currentPhoto) + "/" + String(numberPhotos));
+  else if(currentStatus == 's' && request->hasParam("photosRemaining")){
+    request->send ( 200, "text/html", "Img: " + String(currentPhoto) + "/" + String(numberPhotos));
   }
-  else if(currentStatus == 's' && server.hasArg("timeRemaining")){
-    server.send ( 200, "text/html", "Time remaining: " + String((int)(photoInterval*(numberPhotos - currentPhoto))/1000) + "s");
+  else if(currentStatus == 's' && request->hasParam("timeRemaining")){
+    request->send ( 200, "text/html", "Time remaining: " + String((int)(photoInterval*(numberPhotos - currentPhoto))/1000) + "s");
   }
 
-  else if(currentStatus == 's' && server.hasArg("stop")){
+  else if(currentStatus == 's' && request->hasParam("stop")){
     Serial.println("stop current job");
-    server.send ( 200, "text/html", index_html);
+    request->send ( 200, "text/html", index_html);
     currentStatus = 'i';
   }
   
   
   else if(currentStatus = 'i'){
     Serial.println("bad arguments. sending index.html.. ");
-    server.send ( 200, "text/html", index_html);
+    request->send ( 200, "text/html", index_html);
   }
   else if(currentStatus = 's'){
     Serial.println("bad arguments. sending status.html.. ");
-    server.send ( 200, "text/html", status_html);
+    request->send ( 200, "text/html", status_html);
   }
 }
 
@@ -649,7 +653,14 @@ void setup() {
   Serial.println(myip);
 
   Serial.println("------------------------------");
-  server.on ( "/", handleRequest );
+  
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    handleRequest(request);
+  });
+
+
+
+  
   server.begin(); //start the webserver
   Serial.println("Webserver started");
   
@@ -692,8 +703,4 @@ void loop() {
       disableStepper();
     }
   }
-
-
-  
-  server.handleClient();  //process all the requests for the Webserver
 }
