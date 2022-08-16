@@ -1,7 +1,5 @@
-
-#include <ESP8266WiFi.h>
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
+#include <EEPROM.h>
+#define POS_ADDR 0
 //---------------------------------------------------
 #include <ESP8266WiFi.h>
 const char *ssid = "HS-Slider";
@@ -10,8 +8,8 @@ IPAddress localIp(192,168,5,1);
 IPAddress gateway(192,168,5,1);
 IPAddress subnet(255,255,255,0);
 //---------------------------------------------------
-#include <ESPAsyncWebServer.h>
-AsyncWebServer server(80);  //listen to port 80
+#include <ESP8266WebServer.h>
+ESP8266WebServer server(80);  //listen to port 80
 //---------------------------------------------------
 #include <Arduino.h>
 #include "BasicStepperDriver.h"
@@ -293,34 +291,50 @@ const char index_html[] PROGMEM = R"rawliteral(<!doctype html>
                 if(dur =="" || noPics=="" || dur =="0" || noPics=="0")
                     alert("Duration and Number of Pictures cannot be none!");
                 else
-                window.location.replace("?start"+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+                    window.location.replace("?start"+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics)
             }
             function home(){
                 dur = document.getElementById("duration").value.toString();
                 noPics = document.getElementById("noPics").value.toString();
-                window.location.replace("?home"+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "?home"+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics, true);
+                    xhr.send();
+                    refresh();
             }
             function goToStart(){
                 dur = document.getElementById("duration").value.toString();
                 noPics = document.getElementById("noPics").value.toString();
-                window.location.replace("?gotopos="+slider[0].value+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET","?gotopos="+slider[0].value+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics, true);
+                    xhr.send();
+                    refresh();
             }
             function goToEnd(){
                 dur = document.getElementById("duration").value.toString();
                 noPics = document.getElementById("noPics").value.toString();
-                window.location.replace("?gotopos="+slider[1].value+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "?gotopos="+slider[1].value+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics, true);
+                    xhr.send();
+                    refresh();
             }
             function goToPlus(delta){
                 dur = document.getElementById("duration").value.toString();
                 noPics = document.getElementById("noPics").value.toString();
-                window.location.replace("?gotoplus="+delta+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "?gotoplus="+delta+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics, true);
+                    xhr.send();
+                    refresh();
             }
             function goToMinus(delta){
                 dur = document.getElementById("duration").value.toString();
                 noPics = document.getElementById("noPics").value.toString();
-                window.location.replace("?gotominus="+delta+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "?gotominus="+delta+"&pos1="+slider[0].value+"&pos2="+slider[1].value+"&duration="+dur+"&nopics="+noPics, true);
+                    xhr.send();
+                    refresh();
             }
-
+            
+            window.setInterval('refresh()', 1000);   
             function refresh() {
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function() {
@@ -441,8 +455,8 @@ const char status_html[] PROGMEM = R"rawliteral(<!doctype html>
                 <td colspan="2"><progress id="file" value="32" max="100"> </progress><td>
                 </tr>
                 <tr>
-                    <td id="photosRemaining">Img: 20/600</td>
-                    <td id="timeRemaining">Time remaining: 7000s</td>                </tr>            </table>            
+                    <td id="photosRemaining">Img: NaN</td>
+                    <td id="timeRemaining">Time remaining: NaN</td>                </tr>            </table>            
             <a href="?stop"><button class="start-stop" id="start">Stop</button></a>
             
         </div>
@@ -471,6 +485,8 @@ const char status_html[] PROGMEM = R"rawliteral(<!doctype html>
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
+                            if(parseFloat(this.responseText) < -1)
+                                window.location.replace("/");
                             document.getElementById("file").value= parseFloat(this.responseText); 
                         }
                     }; 
@@ -481,7 +497,6 @@ const char status_html[] PROGMEM = R"rawliteral(<!doctype html>
         </script>
     </body>
 </html>
-
 )rawliteral";
 
 
@@ -520,44 +535,41 @@ char goToPos(int pos,char homing = 0){
   Serial.println("OK");
   enableStepper(); //enalbe stepper
   int steps = pos-currentPos;
-  currentPos = pos;
-
   stepper.move(STEPPER_DIR*steps);
+  
+  currentPos = pos;
+  if(!homing){
+    EEPROM.put(POS_ADDR, currentPos);
+    EEPROM.commit();
+    disableStepper();
+  }
   
   return 0;
 }
 
-
-// Replaces placeholder with stored values
-String processor(const String& var){
-  //Serial.println(var);
-  if(var == "inputString"){
-    return "test";
-  }
-  return String();
-}
-
-void handleRequest(AsyncWebServerRequest *request){
+void handleRequest(){
   Serial.println("request for / received..");
 
-  if(currentStatus == 'i' && request->hasParam("home")){
+  if(currentStatus == 'i' && server.hasArg("home")){
     Serial.println("homing.. ");
-    request->send ( 200, "text/html", index_html);
+    server.send ( 200, "text/html", index_html);
     while(!digitalRead(ENDSTOP_PIN)){
       goToPos(currentPos-MOTOR_STEPS*MICROSTEPS*4,1);
     }
     currentPos=0;
+    EEPROM.put(POS_ADDR, currentPos);
+    EEPROM.commit();
     Serial.println("homed.");
     disableStepper();
-  }else if(currentStatus == 'i' && request->hasParam("start") && request->hasParam("pos1") && request->hasParam("pos2") && request->hasParam("duration") && request->hasParam("nopics")){
+  }else if(currentStatus == 'i' && server.hasArg("start") && server.hasArg("pos1") && server.hasArg("pos2") && server.hasArg("duration") && server.hasArg("nopics")){
     Serial.println("starting timelapse.");
-    request->send ( 200, "text/html", status_html);
+    server.send ( 200, "text/html", status_html);
 
     currentPhoto=0;
-    numberPhotos = (request->getParam("nopics")->value()).toFloat();
-    photoInterval = (request->getParam("duration")->value()).toFloat()/(request->getParam("nopics")->value()).toFloat()*1000;
-    goToPos((int)((float)(request->getParam("pos1")->value()).toFloat()/100*MAX_POS));
-    photoSteps = (int)((float)(((request->getParam("pos2")->value()).toFloat()-(request->getParam("pos1")->value()).toFloat())/100*MAX_POS)/numberPhotos);
+    numberPhotos = (server.arg("nopics")).toFloat();
+    photoInterval = (server.arg("duration")).toFloat()/(server.arg("nopics")).toFloat()*1000;
+    goToPos((int)((float)(server.arg("pos1")).toFloat()/100*MAX_POS));
+    photoSteps = (int)((float)(((server.arg("pos2")).toFloat()-(server.arg("pos1")).toFloat())/100*MAX_POS)/numberPhotos);
     currentStatus ='s';
 
     Serial.print("currentPhoto: ");
@@ -571,47 +583,54 @@ void handleRequest(AsyncWebServerRequest *request){
     Serial.print("photoSteps: ");
     Serial.println(photoSteps);
   }
-  else if(currentStatus == 'i' && request->hasParam("currentpos")){
+  else if(currentStatus == 'i' && server.hasArg("currentpos")){
     Serial.println("sending curretn position update");
-    request->send ( 200, "text/html", String(100*(float)currentPos/MAX_POS));
+    server.send ( 200, "text/html", String(100*(float)currentPos/MAX_POS));
   }
-  else if(currentStatus == 'i' && request->hasParam("gotominus")){
+  else if(currentStatus == 'i' && server.hasArg("gotominus")){
     Serial.println("moving in negative direction");
-    int delta = (request->getParam("gotominus")->value()).toInt();
-    goToPos(currentPos-delta*MICROSTEPS*4);
-    request->send_P ( 200, "text/html", index_html, processor);
+    goToPos(currentPos-(server.arg("gotominus")).toFloat()/100*MAX_POS);
+    server.send ( 200, "text/html", index_html);
   }
-  else if(currentStatus == 'i' && request->hasParam("gotoplus")){
+  else if(currentStatus == 'i' && server.hasArg("gotoplus")){
     Serial.println("moving in positive direction");
-    int delta = (request->getParam("gotominus")->value()).toInt();
-    goToPos(currentPos+delta*MICROSTEPS*4);
-    request->send ( 200, "text/html", index_html);
+    goToPos(currentPos+(server.arg("gotoplus")).toFloat()/100*MAX_POS);
+    server.send ( 200, "text/html", index_html);
   }
-  else if(currentStatus == 's' && request->hasParam("percentDone")){
+  else if(currentStatus == 'i' && server.hasArg("gotopos")){
+    Serial.println("moving into position");
+    goToPos((server.arg("gotopos")).toFloat()/100*MAX_POS);
+    server.send ( 200, "text/html", index_html);
+  }
+  else if(currentStatus == 's' && server.hasArg("percentDone")){
     Serial.println("sending status update");
-    request->send ( 200, "text/html", String(100*(float)currentPhoto/numberPhotos));
+    server.send ( 200, "text/html", String(100*(float)currentPhoto/numberPhotos));
   }
-  else if(currentStatus == 's' && request->hasParam("photosRemaining")){
-    request->send ( 200, "text/html", "Img: " + String(currentPhoto) + "/" + String(numberPhotos));
+  else if(currentStatus == 'i' && server.hasArg("percentDone")){
+    Serial.println("sending status update, done!");
+    server.send ( 200, "text/html", "-2");
   }
-  else if(currentStatus == 's' && request->hasParam("timeRemaining")){
-    request->send ( 200, "text/html", "Time remaining: " + String((int)(photoInterval*(numberPhotos - currentPhoto))/1000) + "s");
+  else if(currentStatus == 's' && server.hasArg("photosRemaining")){
+    server.send ( 200, "text/html", "Img: " + String(currentPhoto) + "/" + String(numberPhotos));
+  }
+  else if(currentStatus == 's' && server.hasArg("timeRemaining")){
+    server.send ( 200, "text/html", "Time remaining: " + String((int)(photoInterval*(numberPhotos - currentPhoto))/1000) + "s");
   }
 
-  else if(currentStatus == 's' && request->hasParam("stop")){
+  else if(currentStatus == 's' && server.hasArg("stop")){
     Serial.println("stop current job");
-    request->send ( 200, "text/html", index_html);
+    server.send ( 200, "text/html", index_html);
     currentStatus = 'i';
   }
   
   
   else if(currentStatus = 'i'){
     Serial.println("bad arguments. sending index.html.. ");
-    request->send ( 200, "text/html", index_html);
+    server.send ( 200, "text/html", index_html);
   }
   else if(currentStatus = 's'){
     Serial.println("bad arguments. sending status.html.. ");
-    request->send ( 200, "text/html", status_html);
+    server.send ( 200, "text/html", status_html);
   }
 }
 
@@ -620,6 +639,10 @@ void setup() {
   Serial.begin(115200); //start the serial output
   Serial.println();
   Serial.println("Starting up");
+  EEPROM.begin(sizeof(currentPos));
+  EEPROM.get(POS_ADDR, currentPos);
+  Serial.print("Curretn Pos: ");
+  Serial.println(currentPos);
 
   pinMode(ENDSTOP_PIN, INPUT);
 
@@ -653,14 +676,7 @@ void setup() {
   Serial.println(myip);
 
   Serial.println("------------------------------");
-  
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    handleRequest(request);
-  });
-
-
-
-  
+  server.on ( "/", handleRequest );
   server.begin(); //start the webserver
   Serial.println("Webserver started");
   
@@ -703,4 +719,8 @@ void loop() {
       disableStepper();
     }
   }
+
+
+  
+  server.handleClient();  //process all the requests for the Webserver
 }
