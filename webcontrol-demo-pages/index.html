@@ -111,95 +111,275 @@
                 margin: 0px 10px;
             }
             
-            
+            /* Style the tab */
+            .tab {
+                margin-top: 50px;
+                padding: 0px;
+                border-radius: 0px 0px 15px 15px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            }
+
+            /* Style the buttons that are used to open the tab content */
+            .tab button {
+                margin: 0px;
+            font-size: 16.5pt;
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            }
+
+            /* Change background color of buttons on hover*/
+            .tab button:hover {
+            background-color: #ddd;
+            color:#000;
+            }
+
+            /* Create an active/current tablink class */
+            .tab button.active {
+                background-color: #0094e2;
+                color: #fff;
+            }
+
+            /* Style the tab content */
+            .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            /*border: 1px solid #ccc;*/
+            border-top: none;
+            position: relative;
+            }
+            .buttonTableContainer{
+                position: absolute;
+                bottom: -8px;
+                width: 100%;
+            }
+            .buttonTable{
+                width: 450px;
+                margin: 13px;
+            }
+            .alignL{
+                text-align: left;
+            }
         </style>
         
     </head>
     <body>
         <div id="container">
-            <table>
-                <tr>
-                    <td><label for="duration">Duration (s):</label></td>
-                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
-                </tr>
-                <tr>
-                <td>
-            <label for="noPics">No. Pictures:</label></td>
-                <td>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="noPics" name="noPics"></td>
-                </tr>
-            </table>
-            
-            <hr>
-        <div class="slidecontainer">
-            <table>
+              <div id="setup" class="tabcontent">
+                <div class="slidecontainer">
+                    <table>
+                        
+                        <tr class="heading"><td colspan="3">Start Position</td></tr>
+                        <tr>
+                        <td><button class="slider-l" id="slider-minus-big-1">-5</button><button class="slider-r" id="slider-minus-1">-1</button></td>
+                        <td><input type="range" min="0" max="100" value="0" class="slider" id="slider-1"></td>
+                            <td><button class="slider-l" id="slider-plus-1">+1</button><button class="slider-r" id="slider-plus-big-1">+5</button></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><center><div class="slider-value" id="slider-value-1">16</div></center></td>
+                        
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
                 
-                <tr class="heading"><td colspan="3">Start Position</td></tr>
-                <tr>
-                <td><button class="slider-l" id="slider-minus-big-1">-5</button><button class="slider-r" id="slider-minus-1">-1</button></td>
-                <td><input type="range" min="0" max="100" value="0" class="slider" id="slider-1"></td>
-                    <td><button class="slider-l" id="slider-plus-1">+1</button><button class="slider-r" id="slider-plus-big-1">+5</button></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><center><div class="slider-value" id="slider-value-1">16</div></center></td>
                 
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-        
-        
-            <hr>
-        
-        <div class="slidecontainer">
-            <table>
-                <tr class="heading"><td colspan="3">End Position</td></tr>
-                <tr>
-                <td><button class="slider-l" id="slider-minus-big-2">-5</button><button class="slider-r" id="slider-minus-2">-1</button></td>
-                <td><input type="range" min="0" max="100" value="100" class="slider" id="slider-2"></td>
-                <td><button class="slider-l" id="slider-plus-2">+1</button><button class="slider-r" id="slider-plus-big-2">+5</button></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><center><div class="slider-value" id="slider-value-2">16</div></center></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-        
-            <hr>
-            <div class="slidecontainer">
+                    <hr>
+                
+                <div class="slidecontainer">
+                    <table>
+                        <tr class="heading"><td colspan="3">End Position</td></tr>
+                        <tr>
+                        <td><button class="slider-l" id="slider-minus-big-2">-5</button><button class="slider-r" id="slider-minus-2">-1</button></td>
+                        <td><input type="range" min="0" max="100" value="100" class="slider" id="slider-2"></td>
+                        <td><button class="slider-l" id="slider-plus-2">+1</button><button class="slider-r" id="slider-plus-big-2">+5</button></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><center><div class="slider-value" id="slider-value-2">16</div></center></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                    <hr>
+                    <div class="slidecontainer">
+                        <table>
+                            <tr class="heading"><td colspan="3">Current Position</td></tr>
+                            <tr>
+                            <td><button class="slider-l" id="slider-minus-big-3" onclick="goToMinus(10)">-10</button><button class="slider-r" id="slider-minus-3" onclick="goToMinus(1)">-1</button></td>
+                            <td><progress id="slider-3" value="32" max="100" class="slider"> </progress></td>
+                            <td><button class="slider-l" id="slider-plus-3" onclick="goToPlus(1)">+1</button><button class="slider-r" id="slider-plus-big-3" onclick="goToPlus(10)">+10</button></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><center><div class="slider-value" id="slider-value-3">16</div></center></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                
+                    <hr>
                 <table>
-                    <tr class="heading"><td colspan="3">Current Position</td></tr>
                     <tr>
-                    <td><button class="slider-l" id="slider-minus-big-3" onclick="goToMinus(10)">-10</button><button class="slider-r" id="slider-minus-3" onclick="goToMinus(1)">-1</button></td>
-                    <td><progress id="slider-3" value="32" max="100" class="slider"> </progress></td>
-                    <td><button class="slider-l" id="slider-plus-3" onclick="goToPlus(1)">+1</button><button class="slider-r" id="slider-plus-big-3" onclick="goToPlus(10)">+10</button></td>
+                        <td><button class="config" id="gotostart"  onclick="goToStart()">Go to Start</button></td>
+                        <td><button class="config" id="gotoend"  onclick="goToEnd()">Go to End</button></td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td><center><div class="slider-value" id="slider-value-3">16</div></center></td>
-                        <td></td>
+                        <td><button class="config" id="home" onclick="home()">Home</button></td>
+                        <td><button class="config" id="takephoto"  onclick="takePhoto()">Take Photo</button></td>
+                    </tr>
+                </table>
+              </div>
+              
+              <div id="timelapse" class="tabcontent">
+                <table>
+                    <tr>
+                        <td><label for="duration">Duration (s):</label></td>
+                        <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
+                    </tr>
+                    <tr>
+                    <td>
+                <label for="noPics">No. Pictures:</label></td>
+                    <td>
+                <input type="number" inputmode="numeric" pattern="[0-9]*" id="noPics" name="noPics"></td>
+                    </tr>
+                </table>
+                <hr />
+                <div class="buttonTableContainer">
+                    <hr />
+                <table class="buttonTable">
+                    <tr>
+                        <td colspan="2"><button class="start-stop" id="gotostart"  onclick="goToStart()">Start</button></td>
+                    </tr>
+                </table>
+                </div>
+              </div>
+              
+              <div id="misc" class="tabcontent">
+                <table>
+                    <tr class="heading">
+                    <td colspan="3">Motion Type</td>
+                    </tr>
+                    <tr>
+                        <td class="alignL"><input type="radio" name="motionType" checked="checked" value="linear" id="linear"><label for="linear">Constant</label></td>
+                    <td></td>
+                    <td></td>
+                    </tr>
+                    <tr>
+                    <td class="alignL"><input type="radio" name="motionType" value="easeInOut" id="easeInOut"><label for="easeInOut">Ease in/out</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="easeIn" id="easeIn"><label for="easeIn">Ease in</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="easeOut" id="easeOut"><label for="easeOut">Ease out</label></td>
+                    </tr>
+                    <tr>
+                    <td class="alignL"><input type="radio" name="motionType" value="rampInOut" id="rampInOut"><label for="rampInOut">Ramp in/out</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="rampIn" id="rampIn"><label for="rampIn">Ramp in</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="rampOut" id="rampOut"><label for="rampOut">Ramp out</label></td>
+                    </tr>
+                </table>
+                <hr/>
+                <div class="slidecontainer">
+                    <table>
+                        
+                        <tr class="heading"><td colspan="3">Auxiliary Point (in)</td></tr>
+                        <tr>
+                        <td><button class="slider-l" id="slider-minus-big-4">-5</button><button class="slider-r" id="slider-minus-4">-1</button></td>
+                        <td><input type="range" min="0" max="100" value="20" class="slider" id="slider-4"></td>
+                            <td><button class="slider-l" id="slider-plus-4">+1</button><button class="slider-r" id="slider-plus-big-4">+5</button></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><center><div class="slider-value" id="slider-value-4">20</div></center></td>
+                        
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <hr/>
+                <div class="slidecontainer">
+                    <table>
+                        
+                        <tr class="heading"><td colspan="3">Auxiliary Point (out)</td></tr>
+                        <tr>
+                        <td><button class="slider-l" id="slider-minus-big-5">-5</button><button class="slider-r" id="slider-minus-5">-1</button></td>
+                        <td><input type="range" min="0" max="100" value="80" class="slider" id="slider-5"></td>
+                            <td><button class="slider-l" id="slider-plus-5">+1</button><button class="slider-r" id="slider-plus-big-5">+5</button></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><center><div class="slider-value" id="slider-value-5">80</div></center></td>
+                        
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="buttonTableContainer">
+                    <hr />
+                <table class="buttonTable">
+                    <tr>
+                        <td colspan="2"><button class="start-stop" id="start" onclick="startJob()">Start</button></td>
                     </tr>
                 </table>
             </div>
-        
-            <hr>
-        <table>
-            <tr>
-                <td><button class="config" id="gotostart"  onclick="goToStart()">Go to Start</button></td>
-                <td><button class="config" id="gotoend"  onclick="goToEnd()">Go to End</button></td>
-            </tr>
-            <tr>
-                <td><button class="config" id="home" onclick="home()">Home</button></td>
-                <td><button class="config" id="takephoto"  onclick="takePhoto()">Take Photo</button></td>
-            </tr>
-            <tr>
-                <td colspan="2"><button class="start-stop" id="start" onclick="startJob()">Start</button></td>
-            </tr>
-        </table>
-            
+              </div>
+              <div id="config" class="tabcontent">
+                <table>
+                    <tr class="heading">
+                        <td colspan="2">Machine</td>
+                    </tr>
+                    <tr>
+                        <td class="alignL"><label for="duration">Max Position:</label></td>
+                        <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
+                    </tr>
+                    <tr>
+                        <td class="alignL"><label for="duration">Motor RPM:</label></td>
+                        <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
+                    </tr>
+                    <tr>
+                    <td colspan="2">
+                        <input type="checkbox" id="invertMotor" name="invertMotor"><label for="invertMotor">Invert Motor Direction</label></td>
+                    <td>
+                </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr class="heading">
+                        <td colspan="2">Photos</td>
+                    </tr>
+                    <tr>
+                        <td class="alignL"><label for="duration">Shutter Time (ms):</label></td>
+                        <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
+                    </tr>
+                    <tr>
+                        <td class="alignL"><label for="duration">Vibration Delay (ms):</label></td>
+                        <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
+                    </tr>
+                </table>
+                <div class="buttonTableContainer">
+                    <hr />
+                <table class="buttonTable">
+                    <tr>
+                        <td colspan="2"><button class="start-stop" id="start" onclick="saveConfig()">Save</button></td>
+                    </tr>
+                </table>
+            </div>
+              </div>
+
+              <div class="tab">
+                <button id="setupButton" class="tablinks active" onclick="openTab('setup')">Camera Setup</button>
+                <button id="timelapseButton" class="tablinks" onclick="openTab('timelapse')">Timelapse</button>
+                <button id="miscButton" class="tablinks" onclick="openTab('misc')">Misc.</button>
+                <button id="configButton" class="tablinks" onclick="openTab('config')">Config</button>
+              </div>
+
             
         </div>
         <script>
@@ -306,7 +486,7 @@
                 refresh();
             }
             
-            window.setInterval('refresh()', 1000);   
+            //window.setInterval('refresh()', 1000);   
             function refresh() {
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function() {
@@ -319,6 +499,39 @@
                     xhr.send();
             }
             refresh();
+
+
+            function openTab(tabId){
+                var tabIds = ["setup", "timelapse", "misc", "config"];
+                var tabIdsC = 4;
+
+                //display tabId tab
+                document.getElementById(tabId).style.display = "block";
+                document.getElementById(tabId + "Button").className += " active";
+                //hide all tabs
+                for(var i =0; i<tabIdsC; ++i){
+                    if(tabIds[i]!=tabId){
+                        document.getElementById(tabIds[i]).style.display = "none";
+                        document.getElementById(tabIds[i] + "Button").className = document.getElementById(tabIds[i] + "Button").className.replace(" active", "");
+                    }
+                }
+            }
+            document.getElementById("setup").style.display = "block";
+
+            function setDivHeight(){
+                var tabIds = ["setup", "timelapse", "misc", "config"];
+                var tabIdsC = 4;
+                //adjust div heigt
+                //get height of camera setup div
+                //-12 for padding (6 top, 6 bottom), 1px border at bottom
+                var divHeight = document.getElementById("setup").offsetHeight - 12 - 1;
+
+                //hide all tabs
+                for(var i =0; i<tabIdsC; ++i){
+                    document.getElementById(tabIds[i]).style.height = divHeight + "px";
+                }
+            }
+            setDivHeight();
         </script>
     </body>
 </html>
