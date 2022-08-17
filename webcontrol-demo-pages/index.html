@@ -16,9 +16,9 @@
         </script>
         
         <style>
-            .slidercontainer{
-                width: 500px;
+            .slidecontainer{
                 margin: auto;
+                transition: color .2s ease-in-out;
             }
             
             .slidecontainer input {
@@ -65,7 +65,7 @@
                   -webkit-appearance: none;
                   margin: 10px 10px;
             }
-            button:hover{
+            button:hover:enabled{
                 background-color: #0094e2;
                 color: #fff;
             }
@@ -105,6 +105,7 @@
             }
             button{
                 touch-action: manipulation;
+                /*transition: color .2s ease-in-out;*/
             }
             .slider{
                 width: 200px;
@@ -113,7 +114,7 @@
             
             /* Style the tab */
             .tab {
-                margin-top: 50px;
+                margin-top: 20.667px;
                 padding: 0px;
                 border-radius: 0px 0px 15px 15px;
             overflow: hidden;
@@ -124,7 +125,7 @@
             /* Style the buttons that are used to open the tab content */
             .tab button {
                 margin: 0px;
-            font-size: 16.5pt;
+            font-size: 16pt;
             background-color: inherit;
             float: left;
             border: none;
@@ -132,6 +133,7 @@
             cursor: pointer;
             padding: 14px 16px;
             transition: 0.3s;
+            font-weight: bold;
             }
 
             /* Change background color of buttons on hover*/
@@ -149,22 +151,27 @@
             /* Style the tab content */
             .tabcontent {
             display: none;
-            padding: 6px 12px;
+            /*padding: 6px 12px;*/
+            padding: 6px 0px;
             /*border: 1px solid #ccc;*/
             border-top: none;
             position: relative;
             }
             .buttonTableContainer{
                 position: absolute;
-                bottom: -8px;
+                bottom: -20px;
                 width: 100%;
             }
             .buttonTable{
                 width: 450px;
-                margin: 13px;
+                margin: 25px;
+                margin-top: 0px;
             }
             .alignL{
                 text-align: left;
+            }
+            hr{
+                border: 1px solid #ccc;
             }
         </style>
         
@@ -240,20 +247,21 @@
               </div>
               
               <div id="timelapse" class="tabcontent">
-                <table>
-                    <tr>
-                        <td><label for="duration">Duration (s):</label></td>
-                        <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
-                    </tr>
-                    <tr>
-                    <td>
-                <label for="noPics">No. Pictures:</label></td>
-                    <td>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="noPics" name="noPics"></td>
-                    </tr>
-                </table>
+                
                 <hr />
                 <div class="buttonTableContainer">
+                    <table>
+                        <tr>
+                            <td><label for="duration">Duration (s):</label></td>
+                            <td><input type="number" inputmode="numeric" pattern="[0-9]*" id="duration" name="duration"></td>
+                        </tr>
+                        <tr>
+                        <td>
+                    <label for="noPics">No. Pictures:</label></td>
+                        <td>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="noPics" name="noPics"></td>
+                        </tr>
+                    </table>
                     <hr />
                 <table class="buttonTable">
                     <tr>
@@ -269,23 +277,23 @@
                     <td colspan="3">Motion Type</td>
                     </tr>
                     <tr>
-                        <td class="alignL"><input type="radio" name="motionType" checked="checked" value="linear" id="linear"><label for="linear">Constant</label></td>
+                        <td class="alignL"><input type="radio" name="motionType" checked="checked" value="linear" id="linear" onchange="updateAuxiliarySliders(-1)"><label for="linear">Constant</label></td>
                     <td></td>
                     <td></td>
                     </tr>
                     <tr>
-                    <td class="alignL"><input type="radio" name="motionType" value="easeInOut" id="easeInOut"><label for="easeInOut">Ease in/out</label></td>
-                    <td class="alignL"><input type="radio" name="motionType" value="easeIn" id="easeIn"><label for="easeIn">Ease in</label></td>
-                    <td class="alignL"><input type="radio" name="motionType" value="easeOut" id="easeOut"><label for="easeOut">Ease out</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="easeInOut" id="easeInOut" onchange="updateAuxiliarySliders(2)"><label for="easeInOut">Ease in/out</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="easeIn" id="easeIn" onchange="updateAuxiliarySliders(0)"><label for="easeIn">Ease in</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="easeOut" id="easeOut" onchange="updateAuxiliarySliders(1)"><label for="easeOut">Ease out</label></td>
                     </tr>
                     <tr>
-                    <td class="alignL"><input type="radio" name="motionType" value="rampInOut" id="rampInOut"><label for="rampInOut">Ramp in/out</label></td>
-                    <td class="alignL"><input type="radio" name="motionType" value="rampIn" id="rampIn"><label for="rampIn">Ramp in</label></td>
-                    <td class="alignL"><input type="radio" name="motionType" value="rampOut" id="rampOut"><label for="rampOut">Ramp out</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="rampInOut" id="rampInOut" onchange="updateAuxiliarySliders(2)"><label for="rampInOut">Ramp in/out</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="rampIn" id="rampIn" onchange="updateAuxiliarySliders(0)"><label for="rampIn">Ramp in</label></td>
+                    <td class="alignL"><input type="radio" name="motionType" value="rampOut" id="rampOut" onchange="updateAuxiliarySliders(1)"><label for="rampOut">Ramp out</label></td>
                     </tr>
                 </table>
                 <hr/>
-                <div class="slidecontainer">
+                <div class="slidecontainer" id="auxiliarySliderContainer0">
                     <table>
                         
                         <tr class="heading"><td colspan="3">Auxiliary Point (in)</td></tr>
@@ -303,7 +311,7 @@
                     </table>
                 </div>
                 <hr/>
-                <div class="slidecontainer">
+                <div class="slidecontainer" id="auxiliarySliderContainer1">
                     <table>
                         
                         <tr class="heading"><td colspan="3">Auxiliary Point (out)</td></tr>
@@ -532,6 +540,57 @@
                 }
             }
             setDivHeight();
+
+            function updateAuxiliarySliders(t){
+                if(t == -1){
+                    disableAuxiliarySlider(0);
+                    disableAuxiliarySlider(1);
+                } else if(t == 0){
+                    enableAuxiliarySlider(0);
+                    disableAuxiliarySlider(1);
+                } else if(t == 1){
+                    disableAuxiliarySlider(0);
+                    enableAuxiliarySlider(1);
+                } else if(t == 2){
+                    enableAuxiliarySlider(0);
+                    enableAuxiliarySlider(1);
+                }
+            }
+            updateAuxiliarySliders(-1);
+            function disableAuxiliarySlider(t){
+                if(t ==0){
+                    document.getElementById("slider-4").setAttribute('disabled', true);
+                    document.getElementById("slider-minus-big-4").setAttribute('disabled', true);
+                    document.getElementById("slider-minus-4").setAttribute('disabled', true);
+                    document.getElementById("slider-plus-big-4").setAttribute('disabled', true);
+                    document.getElementById("slider-plus-4").setAttribute('disabled', true);
+                    document.getElementById("auxiliarySliderContainer0").style.color = "rgba(16, 16, 16, 0.3)";
+                } else if(t ==1){
+                    document.getElementById("slider-5").setAttribute('disabled', true);
+                    document.getElementById("slider-minus-big-5").setAttribute('disabled', true);
+                    document.getElementById("slider-minus-5").setAttribute('disabled', true);
+                    document.getElementById("slider-plus-big-5").setAttribute('disabled', true);
+                    document.getElementById("slider-plus-5").setAttribute('disabled', true);
+                    document.getElementById("auxiliarySliderContainer1").style.color = "rgba(16, 16, 16, 0.3)";
+                }
+            }
+            function enableAuxiliarySlider(t){
+                if(t ==0){
+                    document.getElementById("slider-4").removeAttribute('disabled');
+                    document.getElementById("slider-minus-big-4").removeAttribute('disabled');
+                    document.getElementById("slider-minus-4").removeAttribute('disabled');
+                    document.getElementById("slider-plus-big-4").removeAttribute('disabled');
+                    document.getElementById("slider-plus-4").removeAttribute('disabled');
+                    document.getElementById("auxiliarySliderContainer0").style.color = "#000";
+                } else if(t ==1){
+                    document.getElementById("slider-5").removeAttribute('disabled');
+                    document.getElementById("slider-minus-big-5").removeAttribute('disabled');
+                    document.getElementById("slider-minus-5").removeAttribute('disabled');
+                    document.getElementById("slider-plus-big-5").removeAttribute('disabled');
+                    document.getElementById("slider-plus-5").removeAttribute('disabled');
+                    document.getElementById("auxiliarySliderContainer1").style.color = "#000";
+                }
+            }
         </script>
     </body>
 </html>
