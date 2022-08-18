@@ -265,7 +265,7 @@
                     <hr />
                 <table class="buttonTable">
                     <tr>
-                        <td colspan="2"><button class="start-stop" id="gotostart"  onclick="goToStart()">Start</button></td>
+                        <td colspan="2"><button class="start-stop" id="start"  onclick="startJob()">Start</button></td>
                     </tr>
                 </table>
                 </div>
@@ -575,7 +575,7 @@
                 var xhr3 = new XMLHttpRequest();
                     xhr3.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById("invertMotor").value= parseFloat(this.responseText); 
+                            document.getElementById("invertMotor").checked = parseFloat(this.responseText) >0?false:true; 
                         }
                     }; 
                     xhr3.open("GET", "?invertmotor", true);
@@ -600,8 +600,9 @@
             refresh();
 
             function saveConfig(){
+                var motorDir = document.getElementById("invertMotor").checked?-1:1;
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", "?setmaxpos=" + document.getElementById("maxPos").value + "&setrpm=" + document.getElementById("rpm").value + "&setinvertmotor=" + document.getElementById("invertMotor").value + "&setshutter=" + document.getElementById("shutter").value + "&setvibration=" + document.getElementById("vibration").value, true);
+                xhr.open("GET", "?setmaxpos=" + document.getElementById("maxPos").value + "&setrpm=" + document.getElementById("rpm").value + "&setinvertmotor=" + motorDir + "&setshutter=" + document.getElementById("shutter").value + "&setvibration=" + document.getElementById("vibration").value, true);
                 xhr.send();
             }
 

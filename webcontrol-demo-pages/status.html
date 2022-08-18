@@ -119,25 +119,25 @@
                     xhr.open("GET", "?timeRemaining", true);
                     xhr.send();
 
-                    var xhr = new XMLHttpRequest();
-                    xhr.onreadystatechange = function() {
+                    var xhr1 = new XMLHttpRequest();
+                    xhr1.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("photosRemaining").innerHTML= this.responseText;  
                         }
                     }; 
 
-                    xhr.open("GET", "?photosRemaining", true);
-                    xhr.send();
-                    var xhr = new XMLHttpRequest();
-                    xhr.onreadystatechange = function() {
+                    xhr1.open("GET", "?photosRemaining", true);
+                    xhr1.send();
+                    var xhr2 = new XMLHttpRequest();
+                    xhr2.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             if(parseFloat(this.responseText) < -1)
-                                window.location.replace("");
+                                window.location.replace("/");
                             document.getElementById("file").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?percentDone", true);
-                    xhr.send();
+                    xhr2.open("GET", "?percentDone", true);
+                    xhr2.send();
             }
             refresh();
         </script>
