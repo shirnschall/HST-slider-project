@@ -517,28 +517,31 @@
                     }; 
                     xhr.open("GET", "?pos1", true);
                     xhr.send();
-                    xhr.onreadystatechange = function() {
+                var xhr1 = new XMLHttpRequest();
+                    xhr1.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("slider-2").value= parseFloat(this.responseText); 
                             document.getElementById("slider-value-2").innerHTML = parseFloat(this.responseText);
                         }
                     }; 
-                    xhr.open("GET", "?pos2", true);
-                    xhr.send();
-                    xhr.onreadystatechange = function() {
+                    xhr1.open("GET", "?pos2", true);
+                    xhr1.send();
+                var xhr2 = new XMLHttpRequest();
+                    xhr2.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("noPics").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?nopics", true);
-                    xhr.send();
-                    xhr.onreadystatechange = function() {
+                    xhr2.open("GET", "?nopics", true);
+                    xhr2.send();
+                var xhr3 = new XMLHttpRequest();
+                    xhr3.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("duration").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?duration", true);
-                    xhr.send();
+                    xhr3.open("GET", "?duration", true);
+                    xhr3.send();
             }
             getInitialUIValues();
 
@@ -553,41 +556,46 @@
                     xhr.open("GET", "?currentpos", true);
                     xhr.send();
 
-                    xhr.onreadystatechange = function() {
+                    var xhr1 = new XMLHttpRequest();
+                    xhr1.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("maxPos").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?maxpos", true);
-                    xhr.send();
-                    xhr.onreadystatechange = function() {
+                    xhr1.open("GET", "?maxpos", true);
+                    xhr1.send();
+                var xhr2 = new XMLHttpRequest();
+                    xhr2.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("rpm").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?rpm", true);
-                    xhr.send();
-                    xhr.onreadystatechange = function() {
+                    xhr2.open("GET", "?rpm", true);
+                    xhr2.send();
+                var xhr3 = new XMLHttpRequest();
+                    xhr3.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("invertMotor").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?invertmotor", true);
-                    xhr.send();
-                    xhr.onreadystatechange = function() {
+                    xhr3.open("GET", "?invertmotor", true);
+                    xhr3.send();
+                var xhr4 = new XMLHttpRequest();
+                    xhr4.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("shutter").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?shutter", true);
-                    xhr.send();
-                    xhr.onreadystatechange = function() {
+                    xhr4.open("GET", "?shutter", true);
+                    xhr4.send();
+                var xhr5 = new XMLHttpRequest();
+                    xhr5.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             document.getElementById("vibration").value= parseFloat(this.responseText); 
                         }
                     }; 
-                    xhr.open("GET", "?vibration", true);
-                    xhr.send();
+                    xhr5.open("GET", "?vibration", true);
+                    xhr5.send();
             }
             refresh();
 
